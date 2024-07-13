@@ -111,8 +111,6 @@ pub async fn handler(_req: Request) -> Result<Response<Body>, Error> {
         message.push_str(&format!("{} : {} Blocks behind\n", key, value));
     }
 
-    println!("Message \n{}", message);
-
     send_bot_message(message).await?;
 
     Ok(Response::builder()
@@ -177,8 +175,6 @@ async fn get_indexers() -> Result<HashMap<String, Vec<String>>, reqwest::Error> 
             .push(ipfs_hash.clone());
     }
 
-    println!("{:?}", indexer_map);
-
     Ok(indexer_map)
 }
 
@@ -214,8 +210,6 @@ async fn get_subgraph_status_by_indexer(
         url = indexer_url + "/status";
     }
 
-    println!("{}", url);
-
     let client = reqwest::Client::builder().use_rustls_tls().build()?;
     let response = client.post(url.clone()).json(&req_body).send().await;
     let mut subgraph_statuses: Vec<SubgraphStatus> = vec![];
@@ -237,8 +231,6 @@ async fn get_subgraph_status_by_indexer(
                             .number
                             .parse()
                             .expect("Not a valid number");
-                        println!("Chain Head: {}", chain_head);
-                        println!("Latest Block: {}", latest_block);
                         subgraph_statuses.push(SubgraphStatus {
                             deployment_id: subgraph.subgraph,
                             blocks_behind: chain_head - latest_block,
