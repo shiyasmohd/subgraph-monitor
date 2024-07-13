@@ -1,0 +1,24 @@
+[package]
+name = "subgraph-status-saas"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+reqwest = { version = "0.11", features = ["blocking", "json", "rustls-tls"] }
+vercel_runtime = { version = "1" }
+
+# You can specify a library for shared logic here (optional)
+# [lib]
+# path = "src-rs/lib.rs"
+
+# Each handler has to be specified as [[bin]]
+[[bin]]
+name = "subgraph-status"
+path = "api/subgraph-status.rs"
+
+[[bin]]
+name = "main"
+path = "src/test.rs"
