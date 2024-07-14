@@ -106,23 +106,36 @@ pub async fn handler(_req: Request) -> Result<Response<Body>, Error> {
         subgraph_statuses.remove(&deployment_id);
     }
 
-    let mut message = format!("Subgraphs behind {} Blocks\n\n", BLOCK_BEHIND);
-    for (key, value) in &subgraph_statuses {
-        message.push_str(&format!("{} : {} Blocks behind\n", key, value));
+    if subgraph_statuses.len() > 1 {
+        let mut message = format!("Subgraphs behind {} Blocks\n\n", BLOCK_BEHIND);
+        for (key, value) in &subgraph_statuses {
+            message.push_str(&format!("{} : {} Blocks behind\n", key, value));
+        }
+        send_bot_message(message.clone()).await?;
+        Ok(Response::builder()
+            .status(StatusCode::OK)
+            .header("Content-Type", "application/json")
+            .body(
+                json!({
+                    "message":"Subgraphs with Blocks behind",
+                  "subgraphs": subgraph_statuses
+                })
+                .to_string()
+                .into(),
+            )?)
+    } else {
+        let status = format!("No Subgraphs behind {} Blocks", BLOCK_BEHIND);
+        Ok(Response::builder()
+            .status(StatusCode::OK)
+            .header("Content-Type", "application/json")
+            .body(
+                json!({
+                  "status": status
+                })
+                .to_string()
+                .into(),
+            )?)
     }
-
-    send_bot_message(message).await?;
-
-    Ok(Response::builder()
-        .status(StatusCode::OK)
-        .header("Content-Type", "application/json")
-        .body(
-            json!({
-              "message": "subgraph_statuses"
-            })
-            .to_string()
-            .into(),
-        )?)
 }
 
 async fn get_indexers() -> Result<HashMap<String, Vec<String>>, reqwest::Error> {
